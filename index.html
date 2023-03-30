@@ -15,11 +15,12 @@
 	<h1 id="title">Fractal Tree</h1>
 	<canvas id="canvas" width="800" height="600"></canvas>
 
+
 	<script>
 		var canvas = document.getElementById("canvas");
 		var ctx = canvas.getContext("2d");
 
-		var maxDepth = 1;
+		var maxDepth = 10;
 		var angle = Math.PI;
 		var branchRatio = 0.67;
 		var baseWidth = 10;
@@ -31,34 +32,13 @@
 
 		var color = "blue";
 
-		// add event listener for scroll
-		window.addEventListener("scroll", function(event) {
-			// get the current scroll position
-			var scrollPos = window.scrollY;
-			
-			// calculate the new values for angle and maxDepth
-			var newAngle = Math.min((scrollPos / window.innerHeight) * Math.PI / 2, Math.PI / 5);
-			var newMaxDepth = Math.max(1, Math.min(10, Math.floor((scrollPos / window.innerHeight) * 11)));
-			
-			// check if the user is scrolling up or down
-			if (newAngle > angle) {
-				// scrolling down
-				angle = newAngle;
-				maxDepth = Math.max(maxDepth, newMaxDepth);
-			} else {
-				// scrolling up
-				maxDepth = Math.min(maxDepth, newMaxDepth);
-				angle = Math.max(angle, newAngle);
-			}
-		});
-
 		// add event listener for mouse movement
-		window.addEventListener("mousemove", function(event) {
+ 	 	window.addEventListener("mousemove", function(event) {
 			var rect = canvas.getBoundingClientRect();
 			var mouseX = event.clientX - rect.left;
 			var mouseY = event.clientY - rect.top;
-			angle = Math.min((mouseY / canvas.width) * Math.PI /2, Math.PI / 5);
-			maxDepth = Math.max(1, Math.min(10, Math.floor((mouseX / canvas.height) * 11)));
+			 angle = Math.min((mouseX / canvas.width) * Math.PI /2, Math.PI / 5);
+			 maxDepth = Math.max(1, Math.min(10, Math.floor((mouseY / canvas.height) * 11)));
 			// set the color based on the angle and maxdepth
 			color = getColor(angle, maxDepth);
 			document.getElementById('title').style.color=color;
@@ -69,12 +49,12 @@
 			var rect = canvas.getBoundingClientRect();
 			var touchX = event.touches[0].clientX - rect.left;
 			var touchY = event.touches[0].clientY - rect.top;
-			angle = Math.min((touchY / canvas.width) * Math.PI/2, Math.PI / 5);
-			maxDepth = Math.max(1, Math.min(10, Math.floor((touchX / canvas.height) * 11)));
+			angle = Math.min((touchX / canvas.width) * Math.PI/2, Math.PI / 5);
+			maxDepth = Math.max(1, Math.min(10, Math.floor((touchY / canvas.height) * 11)));
 			// set the color based on the angle and maxdepth
 			color = getColor(angle, maxDepth);
 			document.getElementById('title').style.color=color;
-		});
+		}); 
 
 		// function to generate a color based on the angle and maxdepth
 		function getColor(angle, maxDepth) {
