@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fractal Tree</title>
+	<style>
+		body { text-align:center; background: black; color:blue; font-family: sans-serif;}
+		canvas {
+			border: 1px solid black;
+			margin:0 auto;
+			
+		}
+	</style>
+</head>
+<body>
+	<h1 id="title">Fractal Tree</h1>
+	<canvas id="canvas" width="800" height="600"></canvas>
+
+	<script>
+		var canvas = document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+
+		var maxDepth = 1;
+		var angle = Math.PI;
+		var branchRatio = 0.67;
+		var baseWidth = 10;
+
+		var cursor = {
+			x: canvas.width / 2,
+			y: canvas.height
+		};
+
+		var color = "blue";
+
+// add event listener for scroll
+window.addEventListener("scroll", function(event) {
+    // get the current scroll position
+    var scrollPos = window.scrollY;
+    
+    // calculate the new values for angle and maxDepth
+    var newAngle = Math.min((scrollPos / window.innerHeight) * Math.PI / 2, Math.PI / 5);
+    var newMaxDepth = Math.max(1, Math.min(10, Math.floor((scrollPos / window.innerHeight) * 11)));
+    
+    // check if the user is scrolling up or down
+    if (newAngle > angle) {
+        // scrolling down
+        angle = newAngle;
+        maxDepth = Math.max(maxDepth, newMaxDepth);
+    } else {
+        // scrolling up
+        maxDepth = Math.min(maxDepth, newMaxDepth);
+        angle = Math.max(angle, newAngle);
+    }
+});
+
+// add event listener for mouse movement
+window.addEventListener("mousemove", function(event) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = event.clientX - rect.left;
+    var mouseY = event.clientY - rect.top;
+    angle = Math.min((mouseY / canvas.width) * Math.PI /2, Math.PI / 5);
+    maxDepth = Math.max(1, Math.min(10, Math.floor((mouseX / canvas.height) * 11)));
+    // set the color based on the angle and maxdepth
+    color = getColor(angle, maxDepth);
+	document.getElementById('title').style.color=color;
+});
+
+// add event listener for touch movement
+window.addEventListener("touchmove", function(event) {
+    var rect = canvas.getBoundingClientRect();
+    var touchX = event.touches[0].clientX - rect.left;
+    var touchY = event.touches[0].clientY - rect.top;
+    angle = Math.min((touchY / canvas.width) * Math.PI/2, Math.PI / 5);
+    maxDepth = Math.max(1, Math.min(10, Math.floor((touchX / canvas.height) * 11)));
+    // set the color based on the angle and maxdepth
+    color = getColor(angle, maxDepth);
+	document.getElementById('title').style.color=color;
+});
+
+// function to generate a color based on the angle and maxdepth
+function getColor(angle, maxDepth) {
+    // map the angle and maxdepth to a range of values for the red, green, and blue channels
+    var r = Math.floor((angle / (Math.PI / 2)) * 255);
+    var g = Math.floor((maxDepth / 10) * 255);
+    var b = Math.floor((1 - angle / (Math.PI / 2)) * 255);
+    // combine the red, green, and blue channels into a color string
+    return "rgb(" + b + "," + g + "," + r + ")";
+}
+
+
+		function drawTree(start, depth) {
+			if (depth === 0) {
+				return;
+			}
+
+			ctx.beginPath();
+			ctx.moveTo(start.x, start.y);
+			ctx.lineTo(start.x, start.y - depth * 10);
+			ctx.lineWidth = baseWidth * depth / maxDepth;
+			ctx.strokeStyle = color;
+			ctx.stroke();
+
+			var end = {
+				x: start.x,
+				y: start.y - depth * 10
+			};
+
+			drawBranch(end, depth - 1, angle);
+			drawBranch(end, depth - 1, -angle);
+		}
+
+		function drawBranch(start, depth, angle) {
+			if (depth === 0) {
+				return;
+			}
+
+			ctx.save();
+			ctx.translate(start.x, start.y);
+			ctx.rotate(angle);
+
+			ctx.beginPath();
+			ctx.moveTo(0, 0);
+			ctx.lineTo(0, -depth * 10);
+			ctx.lineWidth = baseWidth * depth / maxDepth;
+			ctx.strokeStyle = color;
+			ctx.stroke();
+
+			var end = {
+				x: 0,
+				y: -depth * 10
+			};
+
+			drawBranch(end, depth - 1, angle);
+			drawBranch(end, depth - 1, -angle);
+
+			ctx.restore();
+		}
+
+		function animateCursor() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			drawTree(cursor, maxDepth);
+
+			ctx.beginPath();
+			ctx.arc(cursor.x, cursor.y, 10, 0, 2 * Math.PI);
+			//ctx.fillStyle = "red";
+			ctx.fill();
+
+			requestAnimationFrame(animateCursor);
+		}
+
+		animateCursor();
+
+	</script>
+</body>
+</html>
